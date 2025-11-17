@@ -1,0 +1,13 @@
+create table public.enquiries (
+  id uuid not null default gen_random_uuid (),
+  created_at timestamp with time zone not null default now(),
+  name text null,
+  phone_number text null,
+  email_id text null,
+  location text null,
+  organization_name text null,
+  "Requirement" text null,
+  status text null,
+  note text null,
+  constraint enquiries_pkey primary key (id)
+) TABLESPACE pg_default;

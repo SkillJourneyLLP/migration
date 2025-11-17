@@ -1,0 +1,19 @@
+create table public.video_upload_sessions (
+  id uuid not null default gen_random_uuid (),
+  candidate_id uuid not null,
+  interview_id uuid not null,
+  upload_session_id text not null,
+  file_name text not null,
+  total_size bigint null,
+  uploaded_size bigint null default 0,
+  chunk_count integer null default 0,
+  status text null default 'active'::text,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  constraint video_upload_sessions_pkey primary key (id),
+  constraint video_upload_sessions_upload_session_id_key unique (upload_session_id)
+) TABLESPACE pg_default;
+
+create trigger update_video_upload_sessions_updated_at BEFORE
+update on video_upload_sessions for EACH row
+execute FUNCTION update_updated_at_column ();

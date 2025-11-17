@@ -1,0 +1,15 @@
+create table public.report_eval_criteria (
+  id uuid not null default gen_random_uuid (),
+  created_at timestamp with time zone not null default now(),
+  interview_id uuid null default gen_random_uuid (),
+  eval_criteria_id uuid null default gen_random_uuid (),
+  candidate_id uuid null default gen_random_uuid (),
+  eval_criteria text null,
+  score text null,
+  justification text null,
+  weightage smallint null,
+  constraint report_eval_criteria_pkey primary key (id),
+  constraint report_eval_criteria_candidate_id_fkey foreign KEY (candidate_id) references candidate (id) on delete CASCADE,
+  constraint report_eval_criteria_eval_criteria_id_fkey foreign KEY (eval_criteria_id) references eval_criteria (id) on delete CASCADE,
+  constraint report_eval_criteria_interview_id_fkey foreign KEY (interview_id) references interview (id) on delete CASCADE
+) TABLESPACE pg_default;

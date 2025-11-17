@@ -1,0 +1,42 @@
+create table public.elevenlabs_sessions (
+  id uuid not null default gen_random_uuid (),
+  candidate_id uuid not null,
+  interview_id uuid not null,
+  api_key_index integer not null,
+  session_status text not null default 'active'::text,
+  allocated_at timestamp with time zone not null default now(),
+  last_heartbeat timestamp with time zone not null default now(),
+  expires_at timestamp with time zone not null default (now() + '02:00:00'::interval),
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  constraint elevenlabs_sessions_pkey primary key (id),
+  constraint elevenlabs_sessions_api_key_index_check check (
+    (
+      (api_key_index >= 1)
+      and (api_key_index <= 6)
+    )
+  ),
+  constraint elevenlabs_sessions_session_status_check check (
+    (
+      session_status = any (
+        array[
+          'active'::text,
+          'completed'::text,
+          'expired'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
+
+create index IF not exists idx_elevenlabs_sessions_candidate_id on public.elevenlabs_sessions using btree (candidate_id) TABLESPACE pg_default;
+
+create index IF not exists idx_elevenlabs_sessions_interview_id on public.elevenlabs_sessions using btree (interview_id) TABLESPACE pg_default;
+
+create index IF not exists idx_elevenlabs_sessions_status on public.elevenlabs_sessions using btree (session_status) TABLESPACE pg_default;
+
+create index IF not exists idx_elevenlabs_sessions_expires_at on public.elevenlabs_sessions using btree (expires_at) TABLESPACE pg_default;
+
+create trigger update_elevenlabs_sessions_updated_at BEFORE
+update on elevenlabs_sessions for EACH row
+execute FUNCTION update_updated_at_column ();

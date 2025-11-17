@@ -1,0 +1,22 @@
+create table public.video_chunks (
+  id uuid not null default gen_random_uuid (),
+  upload_id text not null,
+  candidate_id uuid not null,
+  chunk_index integer not null,
+  total_chunks integer not null,
+  chunk_size integer not null,
+  video_type text null default 'video/webm'::text,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  constraint video_chunks_pkey primary key (id)
+) TABLESPACE pg_default;
+
+create index IF not exists idx_video_chunks_upload_id on public.video_chunks using btree (upload_id) TABLESPACE pg_default;
+
+create index IF not exists idx_video_chunks_candidate_id on public.video_chunks using btree (candidate_id) TABLESPACE pg_default;
+
+create unique INDEX IF not exists idx_video_chunks_upload_chunk on public.video_chunks using btree (upload_id, chunk_index) TABLESPACE pg_default;
+
+create trigger update_video_chunks_updated_at BEFORE
+update on video_chunks for EACH row
+execute FUNCTION update_updated_at_column ();

@@ -1,0 +1,18 @@
+create table public.otps (
+  id uuid not null default gen_random_uuid (),
+  email text not null,
+  otp text not null,
+  expires_at timestamp with time zone not null,
+  verified boolean not null default false,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  constraint otps_pkey primary key (id)
+) TABLESPACE pg_default;
+
+create index IF not exists idx_otps_email_expires on public.otps using btree (email, expires_at) TABLESPACE pg_default;
+
+create index IF not exists idx_otps_expires_at on public.otps using btree (expires_at) TABLESPACE pg_default;
+
+create trigger update_otps_updated_at BEFORE
+update on otps for EACH row
+execute FUNCTION update_updated_at_column ();

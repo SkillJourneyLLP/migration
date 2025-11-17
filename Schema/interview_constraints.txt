@@ -1,0 +1,15 @@
+create table public.interview_constraints (
+  id uuid not null default gen_random_uuid (),
+  interview_id uuid not null,
+  type public.interview_type not null,
+  difficulty public.difficulty_level not null,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  topic text null,
+  constraint interview_constraints_pkey primary key (id),
+  constraint interview_constraints_interview_id_fkey foreign KEY (interview_id) references interview (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+create trigger update_interview_constraints_updated_at BEFORE
+update on interview_constraints for EACH row
+execute FUNCTION update_updated_at_column ();
